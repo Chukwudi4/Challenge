@@ -1,17 +1,42 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, FlatList } from "react-native";
+import { formatPrice, formatTime } from "./src/api/formatter";
 import { fetchProducts } from "./src/api/products";
 
 export default function App() {
+  const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+
   useEffect(() => {
-    fetchProducts(10, 15);
+    refreshProducts();
   }, []);
+
+  const refreshProducts = async () => {
+    const fetchedProducts = await fetchProducts(page, limit);
+    console.log(fetchedProducts);
+  };
+
+  const ProductView = ({ product }) => {
+    return (
+      <View>
+        <Text style={{ fontSize: product.size }}>{product.face}</Text>
+        <View>
+          <Text>{formatPrice(product.price)}</Text>
+          <Text>{formatTime(product.date)}</Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <FlatList
+        data={products}
+        key={(item) => item.id}
+        horizontal={true}
+        renderItem={({ item }) => <ProductView product={item} />}
+      />
     </View>
   );
 }
