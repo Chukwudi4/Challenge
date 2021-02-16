@@ -1,13 +1,10 @@
 import { get } from "./helper";
 
-export async function fetchProducts(page = 10, limit = 0) {
+export async function fetchProducts(page = 1, limit = 20) {
   try {
-    const rawResponse = await get(
-      "api/products",
-      `_page=${page}&_limit=${limit}`
-    );
+    console.log(page);
+    const rawResponse = await get("products", `_page=${1}&_limit=${limit}`);
     const response = await rawResponse.json();
-    console.log(response);
     return response;
   } catch (error) {
     console.log(error);

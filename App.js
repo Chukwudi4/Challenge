@@ -14,15 +14,15 @@ export default function App() {
 
   const refreshProducts = async () => {
     const fetchedProducts = await fetchProducts(page, limit);
-    console.log(fetchedProducts);
+    setProducts(fetchedProducts);
   };
 
-  const ProductView = ({ product }) => {
+  const ProductView = (product) => {
     return (
       <View>
         <Text style={{ fontSize: product.size }}>{product.face}</Text>
         <View>
-          <Text>{formatPrice(product.price)}</Text>
+          <Text>${formatPrice(product.price)}</Text>
           <Text>{formatTime(product.date)}</Text>
         </View>
       </View>
@@ -35,7 +35,7 @@ export default function App() {
         data={products}
         key={(item) => item.id}
         horizontal={true}
-        renderItem={({ item }) => <ProductView product={item} />}
+        renderItem={({ item }) => ProductView(item)}
       />
     </View>
   );
