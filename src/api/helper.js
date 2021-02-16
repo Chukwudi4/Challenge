@@ -4,7 +4,6 @@ export async function get(endpoint, params) {
   try {
     const URL = `${BASE_URL}${endpoint}?${params}`;
     const rawResponse = await fetch(URL);
-    console.log(URL);
     return rawResponse;
   } catch (error) {
     console.log(error);
