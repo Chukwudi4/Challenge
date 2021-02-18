@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
-import { formatPrice, formatTime } from "./src/api/formatter";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import { fetchProducts } from "./src/api/products";
+import ProductItem from "./src/components/ProductItem";
 
 export default function App() {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(30);
+  const [lastR, setLastR] = useState(0);
 
   useEffect(() => {
     refreshProducts();
@@ -14,29 +15,18 @@ export default function App() {
 
   const refreshProducts = async () => {
     const fetchedProducts = await fetchProducts(page, limit);
-    setProducts(fetchedProducts);
+    setPage(page + 1);
+    const tempProducts = products.concat(fetchedProducts);
+    setProducts(tempProducts);
   };
 
   const ProductView = (product, index) => {
-    return (
-      <>
-        {index % 20 === 0 && index !== 0 && (
-          <Image
-            style={{ width: 200, height: 200 }}
-            source={{
-              uri: "http://192.168.0.156:3000/ads?r=201",
-            }}
-          />
-        )}
-        <View>
-          <Text style={{ fontSize: product.size }}>{product.face}</Text>
-          <View>
-            <Text>${formatPrice(product.price)}</Text>
-            <Text>{formatTime(product.date)}</Text>
-          </View>
-        </View>
-      </>
-    );
+    var r = Math.floor(Math.random() * 1000);
+    if (r === lastR) {
+      r = Math.floor(Math.random() * 1000);
+    }
+
+    return <ProductItem index={index} product={product} r={r} />;
   };
 
   return (
@@ -48,6 +38,7 @@ export default function App() {
         style={{
           width: 300,
         }}
+        onEndReached={refreshProducts}
         renderItem={({ item, index }) => ProductView(item, index)}
       />
     </View>
