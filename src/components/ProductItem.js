@@ -3,8 +3,16 @@ import { View, Text } from "react-native";
 import Image from "react-native-fast-image";
 import PropTypes from "prop-types";
 import { formatPrice, formatTime } from "../api/formatter";
+import { BASE_URL } from "../api/helper";
 
 export default class ProductItem extends React.Component {
+  componentDidMount() {
+    const { r, updateR, index } = this.props;
+    if (index & (20 === 0)) {
+      updateR(r);
+    }
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     return !nextProps.product === this.props.product;
   }
@@ -17,7 +25,7 @@ export default class ProductItem extends React.Component {
           <Image
             style={{ width: 100, height: 100 }}
             source={{
-              uri: `http://192.168.0.156:3000/ads?r=${r}`,
+              uri: `${BASE_URL}ads?r=${r}`,
             }}
           />
         )}

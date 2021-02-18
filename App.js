@@ -12,6 +12,7 @@ export default function App() {
   const [lastR, setLastR] = useState(0);
   const [isLoading, setLoading] = useState(true);
   const [selectedSort, setSelectedSort] = useState("price");
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     refreshProducts();
@@ -21,6 +22,7 @@ export default function App() {
     setLoading(true);
     const fetchedProducts = await fetchProducts(page, limit, sort);
     setPage(page + 1);
+    setFinished(fetchedProducts.length === 0);
     const tempProducts = products.concat(fetchedProducts);
     setProducts(tempProducts);
     setLoading(false);
@@ -32,7 +34,9 @@ export default function App() {
       r = Math.floor(Math.random() * 1000);
     }
 
-    return <ProductItem index={index} product={product} r={r} />;
+    return (
+      <ProductItem index={index} product={product} r={r} updateR={setLastR} />
+    );
   };
 
   return (
@@ -50,7 +54,7 @@ export default function App() {
         <Picker.Item label="ID" value="id" />
         <Picker.Item label="Size" value="size" />
       </Picker>
-      <ScrollView>
+      <ScrollView onResponderEnd>
         <View style={styles.container}>
           <View
             style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}
@@ -61,10 +65,10 @@ export default function App() {
               </View>
             ))}
           </View>
-
-          {isLoading && <LoadingComponent />}
         </View>
       </ScrollView>
+      {isLoading && <LoadingComponent />}
+      {finished && <Text>~ end of catalogue ~</Text>}
     </>
   );
 }

@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.0.156:3000/";
+export const BASE_URL = "http://192.168.0.156:3000/";
 
 export async function get(endpoint, params) {
   try {
