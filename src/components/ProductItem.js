@@ -1,9 +1,14 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
+import Image from "react-native-fast-image";
 import PropTypes from "prop-types";
 import { formatPrice, formatTime } from "../api/formatter";
 
-export default class ProductItem extends React.PureComponent {
+export default class ProductItem extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    return false;
+  }
+
   render() {
     const { index, product, r } = this.props;
     return (
