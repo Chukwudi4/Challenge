@@ -6,7 +6,7 @@ import { formatPrice, formatTime } from "../api/formatter";
 
 export default class ProductItem extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    return false;
+    return !nextProps.product === this.props.product;
   }
 
   render() {

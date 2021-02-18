@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { fetchProducts } from "./src/api/products";
 import LoadingComponent from "./src/components/LoadingComponent";
 import ProductItem from "./src/components/ProductItem";
+import { Picker } from "@react-native-picker/picker";
 
 export default function App() {
   const [products, setProducts] = useState([]);
@@ -10,14 +11,15 @@ export default function App() {
   const [limit] = useState(30);
   const [lastR, setLastR] = useState(0);
   const [isLoading, setLoading] = useState(true);
+  const [selectedSort, setSelectedSort] = useState("price");
 
   useEffect(() => {
     refreshProducts();
   }, []);
 
-  const refreshProducts = async () => {
+  const refreshProducts = async (sort = "price") => {
     setLoading(true);
-    const fetchedProducts = await fetchProducts(page, limit);
+    const fetchedProducts = await fetchProducts(page, limit, sort);
     setPage(page + 1);
     const tempProducts = products.concat(fetchedProducts);
     setProducts(tempProducts);
@@ -34,29 +36,36 @@ export default function App() {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        {/* <FlatList
-        data={products}
-        key={(item) => item.id}
-        // horizontal={true}
-        style={{
-          width: 300,
+    <>
+      <Picker
+        selectedValue={selectedSort}
+        style={{ height: 50, width: 100 }}
+        onValueChange={(itemValue, itemIndex) => {
+          setProducts([]);
+          refreshProducts(itemValue);
+          setSelectedSort(itemValue);
         }}
-        onEndReached={refreshProducts}
-        renderItem={({ item, index }) => ProductView(item, index)}
-      /> */}
-        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}>
-          {products.map((item, index) => (
-            <View style={{ width: "50%", marginVertical: 50 }} key={index}>
-              {ProductView(item, index)}
-            </View>
-          ))}
-        </View>
+      >
+        <Picker.Item label="Price" value="price" />
+        <Picker.Item label="ID" value="id" />
+        <Picker.Item label="Size" value="size" />
+      </Picker>
+      <ScrollView>
+        <View style={styles.container}>
+          <View
+            style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}
+          >
+            {products.map((item, index) => (
+              <View style={{ width: "50%", marginVertical: 50 }} key={index}>
+                {ProductView(item, index)}
+              </View>
+            ))}
+          </View>
 
-        {isLoading && <LoadingComponent />}
-      </View>
-    </ScrollView>
+          {isLoading && <LoadingComponent />}
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
