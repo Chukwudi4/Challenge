@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { fetchProducts } from "./src/api/products";
 import LoadingComponent from "./src/components/LoadingComponent";
 import ProductItem from "./src/components/ProductItem";
@@ -34,8 +34,9 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
+    <ScrollView>
+      <View style={styles.container}>
+        {/* <FlatList
         data={products}
         key={(item) => item.id}
         // horizontal={true}
@@ -44,9 +45,18 @@ export default function App() {
         }}
         onEndReached={refreshProducts}
         renderItem={({ item, index }) => ProductView(item, index)}
-      />
-      {isLoading && <LoadingComponent />}
-    </View>
+      /> */}
+        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}>
+          {products.map((item, index) => (
+            <View style={{ width: "50%", marginVertical: 50 }} key={index}>
+              {ProductView(item, index)}
+            </View>
+          ))}
+        </View>
+
+        {isLoading && <LoadingComponent />}
+      </View>
+    </ScrollView>
   );
 }
 

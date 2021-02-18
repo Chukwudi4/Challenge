@@ -15,7 +15,7 @@ export default class ProductItem extends React.Component {
       <>
         {index % 20 === 0 && index !== 0 && (
           <Image
-            style={{ width: 200, height: 200 }}
+            style={{ width: 100, height: 100 }}
             source={{
               uri: `http://192.168.0.156:3000/ads?r=${r}`,
             }}
