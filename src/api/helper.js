@@ -1,4 +1,4 @@
-export const BASE_URL = ""; // declare your host here e.g ''
+export const BASE_URL = ""; // declare your host here e.g '127.0.0.1/'
 
 export async function get(endpoint, params) {
   return new Promise((resolve) => {
