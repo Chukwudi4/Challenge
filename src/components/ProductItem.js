@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Image from "react-native-fast-image";
 import PropTypes from "prop-types";
 import { formatPrice, formatTime } from "../api/formatter";
@@ -29,7 +29,7 @@ export default class ProductItem extends React.Component {
             }}
           />
         )}
-        <View>
+        <View style={styles.productStyle}>
           <Text style={{ fontSize: product.size }}>{product.face}</Text>
           <View>
             <Text>${formatPrice(product.price)}</Text>
@@ -45,3 +45,9 @@ ProductItem.propTypes = {
   index: PropTypes.number,
   product: PropTypes.object,
 };
+
+const styles = StyleSheet.create({
+  productStyle: {
+    margin: 20,
+  },
+});

@@ -16,7 +16,7 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [cache, updateCache] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(30);
+  const [limit] = useState(50);
   const [lastR, setLastR] = useState(0);
   const [isLoading, setLoading] = useState(true);
   const [selectedSort, setSelectedSort] = useState("price");
@@ -27,11 +27,8 @@ export default function App() {
   }, []);
 
   const onMount = () => {
-    fetchProducts(page, limit, selectedSort).then((newProducts) => {
-      setPage(page + 1);
-      setProducts(newProducts);
-      fetchAndCacheProducts();
-    });
+    setPage(1);
+    fetchAndCacheProducts();
   };
 
   const fetchAndCacheProducts = async () => {
@@ -40,7 +37,12 @@ export default function App() {
     fetchProducts(page, limit, selectedSort)
       .then((newProducts) => {
         setPage(page + 1);
-        updateCache(newProducts);
+
+        if (products.length === 0) {
+          setProducts(newProducts);
+        } else {
+          updateCache(newProducts);
+        }
         setFinished(newProducts.length === 0);
         setLoading(false);
       })
@@ -51,9 +53,11 @@ export default function App() {
   };
 
   const refreshProducts = () => {
-    const tempProducts = products.concat(cache);
-    setProducts(tempProducts);
-    fetchAndCacheProducts();
+    if (!isLoading) {
+      const tempProducts = products.concat(cache);
+      setProducts(tempProducts);
+      fetchAndCacheProducts();
+    }
   };
 
   const ProductView = (product, index) => {
@@ -73,6 +77,7 @@ export default function App() {
         selectedValue={selectedSort}
         style={{ height: 50, width: 100 }}
         onValueChange={(itemValue) => {
+          setProducts([]);
           setSelectedSort(itemValue);
           onMount();
         }}
@@ -84,28 +89,20 @@ export default function App() {
       <FlatList
         data={products}
         key={(item) => item.id}
+        contentContainerStyle={styles.flatListCOntainerStyle}
         numColumns={2}
         style={{
-          width: 300,
+          width: "100%",
         }}
-        onEndReached={refreshProducts}
+        onEndReached={() => {
+          if (!finished) {
+            refreshProducts();
+          }
+        }}
         renderItem={({ item, index }) => ProductView(item, index)}
       />
-      {/* <ScrollView onResponderEnd>
-        <View style={styles.container}>
-          <View
-            style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}
-          >
-            {products.map((item, index) => (
-              <View style={{ width: "50%", marginVertical: 50 }} key={index}>
-                {ProductView(item, index)}
-              </View>
-            ))}
-          </View>
-        </View>
-      </ScrollView> */}
       {isLoading && <LoadingComponent />}
-      {finished && <Text>~ end of catalogue ~</Text>}
+      {finished && !isLoading && <Text>~ end of catalogue ~</Text>}
     </>
   );
 }
@@ -116,5 +113,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
+  },
+  flatListCOntainerStyle: {
+    // alignItems: "stretch",
   },
 });
