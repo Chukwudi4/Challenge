@@ -8,7 +8,7 @@ import { BASE_URL } from "../api/helper";
 export default class ProductItem extends React.Component {
   componentDidMount() {
     const { r, updateR, index } = this.props;
-    if (index & (20 === 0)) {
+    if (index && 20 === 0) {
       updateR(r);
     }
   }

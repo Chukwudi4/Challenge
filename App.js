@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  FlatList,
+  View,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { fetchProducts } from "./src/api/products";
 import LoadingComponent from "./src/components/LoadingComponent";
 import ProductItem from "./src/components/ProductItem";
@@ -7,6 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 
 export default function App() {
   const [products, setProducts] = useState([]);
+  const [cache, updateCache] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(30);
   const [lastR, setLastR] = useState(0);
@@ -15,17 +23,37 @@ export default function App() {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    refreshProducts();
+    onMount();
   }, []);
 
-  const refreshProducts = async (sort = "price") => {
+  const onMount = () => {
+    fetchProducts(page, limit, selectedSort).then((newProducts) => {
+      setPage(page + 1);
+      setProducts(newProducts);
+      fetchAndCacheProducts();
+    });
+  };
+
+  const fetchAndCacheProducts = async () => {
     setLoading(true);
-    const fetchedProducts = await fetchProducts(page, limit, sort);
-    setPage(page + 1);
-    setFinished(fetchedProducts.length === 0);
-    const tempProducts = products.concat(fetchedProducts);
+    updateCache([]);
+    fetchProducts(page, limit, selectedSort)
+      .then((newProducts) => {
+        setPage(page + 1);
+        updateCache(newProducts);
+        setFinished(newProducts.length === 0);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        Alert.alert("Network error");
+      });
+  };
+
+  const refreshProducts = () => {
+    const tempProducts = products.concat(cache);
     setProducts(tempProducts);
-    setLoading(false);
+    fetchAndCacheProducts();
   };
 
   const ProductView = (product, index) => {
@@ -44,17 +72,26 @@ export default function App() {
       <Picker
         selectedValue={selectedSort}
         style={{ height: 50, width: 100 }}
-        onValueChange={(itemValue, itemIndex) => {
-          setProducts([]);
-          refreshProducts(itemValue);
+        onValueChange={(itemValue) => {
           setSelectedSort(itemValue);
+          onMount();
         }}
       >
         <Picker.Item label="Price" value="price" />
         <Picker.Item label="ID" value="id" />
         <Picker.Item label="Size" value="size" />
       </Picker>
-      <ScrollView onResponderEnd>
+      <FlatList
+        data={products}
+        key={(item) => item.id}
+        numColumns={2}
+        style={{
+          width: 300,
+        }}
+        onEndReached={refreshProducts}
+        renderItem={({ item, index }) => ProductView(item, index)}
+      />
+      {/* <ScrollView onResponderEnd>
         <View style={styles.container}>
           <View
             style={{ flexDirection: "row", flexWrap: "wrap", width: "100%" }}
@@ -66,7 +103,7 @@ export default function App() {
             ))}
           </View>
         </View>
-      </ScrollView>
+      </ScrollView> */}
       {isLoading && <LoadingComponent />}
       {finished && <Text>~ end of catalogue ~</Text>}
     </>
